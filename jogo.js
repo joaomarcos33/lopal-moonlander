@@ -14,7 +14,7 @@ let moduloLunar = {
         x: 100,
         y: 100
     },
-    angulo: 0,
+    angulo: -Math.PI/2,
     largura: 20,
     altura: 20,
     cor: "lightgray",
@@ -24,6 +24,7 @@ let moduloLunar = {
         y: 0
     },
     combustivel: 1000,
+    combustivelMax: 1000,
     rotacaoAntiHorario: false,
     rotacaoHorario: false
 };
@@ -55,49 +56,43 @@ function desenharChama() {
     contexto.fill();
 }
 
-function mostrarVelocidade() {
+function mostrarIndicadores() {
     contexto.font = "bold 18px Arial";
-    contexto.textAlign = "center";
+    contexto.textAlign = "left";
     contexto.textBaseline = "middle";
     contexto.fillStyle = "lightgray";
-    let velocidade = `Velocidade: ${(10 * moduloLunar.velocidade.y).toFixed(1)}`;
-    contexto.fillText(velocidade, 100, 60);
-}
-
-function mostrarCombustivel() {
-    contexto.font = "bold 18px Arial";
-    contexto.textAlign = "center";
-    contexto.textBaseline = "middle";
-    contexto.fillStyle = "lightgray";
-    let combustivel = `Combustível: ${(moduloLunar.combustivel).toFixed(0)}`;
-    contexto.fillText(combustivel, 100, 80);
+    contexto.fillText(`Velocidade Vertical: ${(10 * moduloLunar.velocidade.y).toFixed(1)}`, 10, 20);
+    contexto.fillText(`Velocidade Horizontal: ${(moduloLunar.velocidade.x).toFixed(1)}`, 10, 40);
+    contexto.fillText(`Ângulo: ${(moduloLunar.angulo * (180 / Math.PI)).toFixed(1)}°`, 10, 60);
+    let combustivelPorcentagem = (moduloLunar.combustivel / moduloLunar.combustivelMax) * 100;
+    contexto.fillText(`Combustível: ${combustivelPorcentagem.toFixed(0)}%`, 10, 80);
+    let altitude = canvas.height - moduloLunar.posicao.y;
+    contexto.fillText(`Altitude: ${altitude.toFixed(0)}m`, 10, 100);
 }
 
 function desenhar() {
-    // Limpar a tela
     contexto.clearRect(0, 0, canvas.width, canvas.height);
-    // Atualizar o módulo lunar em função da gravidade 
-    mostrarVelocidade();
-    mostrarCombustivel();
+    mostrarIndicadores();
     atracaoGravitacional();
     desenharModuloLunar();
 
     if (moduloLunar.posicao.y >= (canvas.height - 0.5 * moduloLunar.altura)) {
         if (moduloLunar.velocidade.y >= 0.5) {
-            alert("Se fodeu!");
+            
+            contexto.font = "bold 50px Fantasy";
+            contexto.fillStyle = "red";
+            contexto.textAlign = "center";
+            contexto.fillText("VOCÊ MORREU🍆!", canvas.width / 2, canvas.height / 2);
         } else {
-            alert("Você conseguiu pousar!");
+            alert("Você conseguiu pousar🐔!");
         }
         return;
     }
 
-    // Repetir a execução da função desenhar a cada atualização de tela
     requestAnimationFrame(desenhar);
 }
 
-// Pressionando a seta para cima para ligar o motor 
 document.addEventListener("keydown", teclaPressionada);
-
 function teclaPressionada(evento) {
     if (evento.keyCode == 38) {
         moduloLunar.motorLigado = true;
@@ -109,7 +104,6 @@ function teclaPressionada(evento) {
 }
 
 document.addEventListener("keyup", teclaSolta);
-
 function teclaSolta(evento) {
     if (evento.keyCode == 38) {
         moduloLunar.motorLigado = false;
@@ -121,30 +115,27 @@ function teclaSolta(evento) {
 }
 
 let gravidade = 0.01;
-
 function atracaoGravitacional() {
     moduloLunar.posicao.x += moduloLunar.velocidade.x;
     moduloLunar.posicao.y += moduloLunar.velocidade.y;
-
+    
     if (moduloLunar.rotacaoAntiHorario) {
         moduloLunar.angulo += Math.PI / 180;
     } else if (moduloLunar.rotacaoHorario) {
         moduloLunar.angulo -= Math.PI / 180;
     }
+    
     if(moduloLunar.motorLigado){
-        moduloLunar.velocidade.y -=0.0115*Math.cos(moduloLunar.angulo);
-        moduloLunar.velocidade.x +=0.0115*Math.cos(moduloLunar.angulo);
+        moduloLunar.velocidade.y -= 0.0115 * Math.cos(moduloLunar.angulo);
+        moduloLunar.velocidade.x += 0.0115 * Math.sin(moduloLunar.angulo);
     }
-
-    if (moduloLunar.motorLigado) {
-        moduloLunar.velocidade.y -= 0.0115;
-        if (moduloLunar.combustivel > 0) {
-            moduloLunar.combustivel--;
-        } else {
-            moduloLunar.motorLigado = false;
-        }
+    
+    if (moduloLunar.motorLigado && moduloLunar.combustivel > 0) {
+        moduloLunar.combustivel--;
+    } else {
+        moduloLunar.motorLigado = false;
     }
-
+    
     moduloLunar.velocidade.y += gravidade;
 }
 
