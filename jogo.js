@@ -29,6 +29,17 @@ let moduloLunar = {
     rotacaoHorario: false
 };
 
+let estrelas=[];
+for(let i = 0; i < 500; i++){
+    estrelas[i] = {
+        x: Math.random()*canvas.width,
+        y: Math.random()* canvas.height,
+        raio: Math.sqrt(Math.random()*2),
+        transparencia:1.0,
+        diminuicao:true,
+        razãoDeCintilacao: Math.random()*0.05
+    };
+}
 function desenharModuloLunar() {
     contexto.save();
     contexto.beginPath();
@@ -70,6 +81,18 @@ function mostrarIndicadores() {
     contexto.fillText(`Altitude: ${altitude.toFixed(0)}m`, 10, 100);
 }
 
+    function desenharEstrelas(){
+        for ( let i=0; i < estrelas,length; i++ ){
+            let estrela=estrelas[i];
+            contexto.beginPath();
+            contexto.arc(estrela.x, estrela.y, estrela.raio, 0, 2*Math.PI);
+            contexto.closePath();
+            contexto.fillStyle="rgba(255,255,255"+estrela.transparencia+")";
+            contexto.fill();
+            contexto.restore();
+
+        }
+}
 function desenhar() {
     contexto.clearRect(0, 0, canvas.width, canvas.height);
     mostrarIndicadores();
