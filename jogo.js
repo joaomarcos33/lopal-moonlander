@@ -28,18 +28,24 @@ let moduloLunar = {
     rotacaoAntiHorario: false,
     rotacaoHorario: false
 };
+let estrelas = []
 
-let estrelas=[];
-for(let i = 0; i < 500; i++){
-    estrelas[i] = {
-        x: Math.random()*canvas.width,
-        y: Math.random()* canvas.height,
-        raio: Math.sqrt(Math.random()*2),
-        transparencia:1.0,
-        diminuicao:true,
-        razãoDeCintilacao: Math.random()*0.05
-    };
+for(let i =0; i<100;i++){
+   estrelas[i] = {
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    raio: 2 
+};
 }
+
+
+let estrela ={
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    raio: 2 
+};
+
+
 function desenharModuloLunar() {
     contexto.save();
     contexto.beginPath();
@@ -81,23 +87,27 @@ function mostrarIndicadores() {
     contexto.fillText(`Altitude: ${altitude.toFixed(0)}m`, 10, 100);
 }
 
-    function desenharEstrelas(){
-        for ( let i=0; i < estrelas,length; i++ ){
-            let estrela=estrelas[i];
-            contexto.beginPath();
-            contexto.arc(estrela.x, estrela.y, estrela.raio, 0, 2*Math.PI);
-            contexto.closePath();
-            contexto.fillStyle="rgba(255,255,255"+estrela.transparencia+")";
-            contexto.fill();
-            contexto.restore();
-
-        }
+function DesenharEstrelas(){
+    contexto.save();
+    for(let i =0;i<estrelas.length;i++){
+        let estrela = estrelas[i];
+    contexto.beginPath();
+    contexto.arc(estrela.x,estrela.y,estrela.raio,0,2*Math.PI);
+    contexto.closePath();
+    contexto.fillStyle="white";
+    contexto.fill();
+    }
+    
+    
+    contexto.restore();
 }
+    
 function desenhar() {
     contexto.clearRect(0, 0, canvas.width, canvas.height);
     mostrarIndicadores();
     atracaoGravitacional();
     desenharModuloLunar();
+    DesenharEstrelas();
 
     if (moduloLunar.posicao.y >= (canvas.height - 0.5 * moduloLunar.altura)) {
         if (moduloLunar.velocidade.y >= 0.5) {
